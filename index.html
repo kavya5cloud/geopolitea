@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geopolitea ☕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Press Start 2P', cursive;
+      background: url('assets/pixel-cafe-bg.png') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #3e3e3e;
+    }
+
+    .chat-card {
+      background: #fefcf3;
+      border: 4px solid #5c4b51;
+      max-width: 600px;
+      width: 90%;
+      padding: 20px;
+      box-shadow: 0 0 0 8px #8b2635;
+      z-index: 2;
+    }
+
+    .messages {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .msg-user {
+      text-align: right;
+      color: #3e3e3e;
+    }
+
+    .msg-ai {
+      text-align: left;
+      color: #8b2635;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      background: #fff3c7;
+      border: 2px solid #5c4b51;
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    button {
+      background: #8b2635;
+      color: #fff3c7;
+      border: 2px solid #5c4b51;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    
+
+    .avatars-scene img {
+      image-rendering: pixelated;
+    }
+
+    .avatars-scene img:not(
+
+    .tea-cup {
+      width: 48px;
+      height: auto;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-card">
+    <div class="messages" id="messages">
+      <div class="msg-ai">Heyyy bestie ☕ I'm Ms. Diplomatt. What's the tea you wanna sip today?</div>
+    </div>
+    <div class="input-row">
+      <input type="text" id="input" placeholder="Ask something like 'Why does NATO matter?'" />
+      <button onclick="sendMessage()">Spill ☕</button>
+    </div>
+  </div>
+
+  
+
+  <script>
+    const messagesDiv = document.getElementById("messages");
+    const inputBox = document.getElementById("input");
+
+    async function sendMessage() {
+      const userText = inputBox.value.trim();
+      if (!userText) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "msg-user";
+      userMsg.textContent = userText;
+      messagesDiv.appendChild(userMsg);
+      inputBox.value = "";
+
+      const loadingMsg = document.createElement("div");
+      loadingMsg.className = "msg-ai";
+      loadingMsg.textContent = "Ms. Diplomatt is brewing your tea... 🍵";
+      messagesDiv.appendChild(loadingMsg);
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
+          body: JSON.stringify({
+            model: "llama3-8b-8192",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are Ms. Diplomatt, a pixel-style Gen Z diplomat in a café. Give short, spicy, Gen Z-style answers about global politics like you're gossiping over tea with your bestie. Keep it under 3 sentences."
+              },
+              { role: "user", content: userText }
+            ]
+          })
+        });
+
+        const data = await response.json();
+        loadingMsg.remove();
+
+        const aiMsg = document.createElement("div");
+        aiMsg.className = "msg-ai";
+        aiMsg.textContent = `🫖 ${data.choices[0].message.content.trim()}`;
+        messagesDiv.appendChild(aiMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      } catch (err) {
+        loadingMsg.remove();
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "msg-ai";
+        errorMsg.textContent = "Oops! Diplomatt spilled the tea... Try again later. 😓";
+        messagesDiv.appendChild(errorMsg);
+      }
+    }
+
+    inputBox.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
