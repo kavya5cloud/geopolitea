@@ -7,26 +7,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
     body {
-      margin: 0;
-      font-family: 'Press Start 2P', cursive;
-      background: url('geopolitea/assets/pixel-cafe-bg.png') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #3e3e3e;
-    }
+  margin: 0;
+  font-family: 'Press Start 2P', cursive;
+  background: url('assets/entry-pixel-image.png') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #3e3e3e;
+  transition: background 0.8s ease;
+}
 
-    .chat-card {
+    .entry-screen, .chat-card {
+      display: none;
+      flex-direction: column;
+      align-items: center;
       background: #fefcf3;
       border: 4px solid #5c4b51;
-      max-width: 600px;
-      width: 90%;
       padding: 20px;
       box-shadow: 0 0 0 8px #8b2635;
-      z-index: 2;
+      max-width: 600px;
+      width: 90%;
+    }
+
+    .entry-screen.active, .chat-card.active {
+      display: flex;
+    }
+
+    .entry-screen h1 {
+      font-size: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .entry-screen button {
+      background: #8b2635;
+      color: #fff3c7;
+      border: 2px solid #5c4b51;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
     }
 
     .messages {
@@ -61,7 +83,7 @@
       font-size: 12px;
     }
 
-    button {
+    button.send-btn {
       background: #8b2635;
       color: #fff3c7;
       border: 2px solid #5c4b51;
@@ -70,38 +92,77 @@
       font-size: 12px;
       cursor: pointer;
     }
-
-    
-
-    .avatars-scene img {
-      image-rendering: pixelated;
+      @keyframes pixelFadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+        filter: contrast(50%) blur(2px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: contrast(100%) blur(0);
+      }
     }
 
-    .avatars-scene img:not(
+    .entry-screen {
+      animation: pixelFadeIn 1.2s ease-out;
+    }
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+    }
 
-    .tea-cup {
-      width: 48px;
+    .fade-out {
+      animation: fadeOut 0.8s forwards;
+    }
+
+    .entry-screen img {
+      width: 180px;
       height: auto;
-      margin-bottom: 30px;
+      margin-bottom: 16px;
     }
-  </style>
+</style>
 </head>
 <body>
-  <div class="chat-card">
+  <div class="entry-screen active" id="entry">
+    
+    <h1>Welcome to Geopolitea ☕<br />Spill some global tea with Ms. Diplomatt</h1>
+    <button onclick="enterChat()">Enter Café</button>
+  </div>
+
+  <div class="chat-card" id="chat">
     <div class="messages" id="messages">
       <div class="msg-ai">Heyyy bestie ☕ I'm Ms. Diplomatt. What's the tea you wanna sip today?</div>
     </div>
     <div class="input-row">
-      <input type="text" id="input" placeholder="Ask something like 'Why does NATO matter?'" />
-      <button onclick="sendMessage()">Spill ☕</button>
+      <input type="text" id="input" placeholder="Ask something like 'Why does NATO matter?'"></input>
+      <button class="send-btn" onclick="sendMessage()">Spill ☕</button>
     </div>
   </div>
 
-  
-
   <script>
+    const entryScreen = document.getElementById("entry");
+    const chatCard = document.getElementById("chat");
     const messagesDiv = document.getElementById("messages");
     const inputBox = document.getElementById("input");
+
+    function enterChat() {
+  entryScreen.classList.add("fade-out");
+  document.body.style.background = "url('assets/pixel-cafe-bg.png') no-repeat center center fixed";
+  document.body.style.backgroundSize = "cover";
+  setTimeout(() => {
+    entryScreen.classList.remove("active");
+    chatCard.classList.add("active");
+  }, 800);
+}
+
 
     async function sendMessage() {
       const userText = inputBox.value.trim();
@@ -123,7 +184,7 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
+            "Authorization": "Bearer YOUR_GROQ_API_KEY"
           },
           body: JSON.stringify({
             model: "llama3-8b-8192",
