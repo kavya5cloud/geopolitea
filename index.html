@@ -180,23 +180,12 @@
       messagesDiv.appendChild(loadingMsg);
 
       try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            model: "llama3-8b-8192",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are Ms. Diplomatt, a pixel-style Gen Z diplomat in a café. Give short, spicy, Gen Z-style answers about global politics like you're gossiping over tea with your bestie. Keep it under 3 sentences."
-              },
-              { role: "user", content: userText }
-            ]
-          })
+          body: JSON.stringify({ message: userText })
         });
 
         const data = await response.json();
@@ -204,7 +193,7 @@
 
         const aiMsg = document.createElement("div");
         aiMsg.className = "msg-ai";
-        aiMsg.textContent = `🫖 ${data.choices[0].message.content.trim()}`;
+        aiMsg.textContent = `🫖 ${data.reply.trim()}`;
         messagesDiv.appendChild(aiMsg);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
@@ -212,7 +201,7 @@
         loadingMsg.remove();
         const errorMsg = document.createElement("div");
         errorMsg.className = "msg-ai";
-        errorMsg.textContent = "Oops! Diplomatt spilled the tea... Try again later. 😓";
+        errorMsg.textContent = "Oops! Diplomatt spilled the tea... Please try again in a moment. 😓";
         messagesDiv.appendChild(errorMsg);
       }
     }
